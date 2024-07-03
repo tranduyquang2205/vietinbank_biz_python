@@ -101,6 +101,9 @@ Yr4ZPChxNrik1CFLxfkesoReXN8kU/8918D0GLNeVt/C\n\
             
         else:
             self.parse_data()
+            self.username = username
+            self.password = password
+            self.account_number = account_number
     def save_data(self):
         data = {
             'username': self.username,
