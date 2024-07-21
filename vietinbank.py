@@ -178,7 +178,10 @@ Yr4ZPChxNrik1CFLxfkesoReXN8kU/8918D0GLNeVt/C\n\
         'sec-ch-ua-platform': '"Windows"'
         }
         response = self.session.post(url, headers=headers, data=json.dumps(data))
-        result = response.json()
+        try:
+            result = response.json()
+        except:
+            result = response.text
         return result
 
     def generate_request_id(self):
@@ -351,7 +354,9 @@ Yr4ZPChxNrik1CFLxfkesoReXN8kU/8918D0GLNeVt/C\n\
             "username": self.encrypt_message(self.username),
             "version": self.app_version
         }
+        print(param)
         result = self.curlPost(self.url['getHistories'], param)
+        print(result)
         if 'status' in result and 'code' in result['status'] and result['status']['code'] == "1":
             return {'code':200,'success': True, 'message': 'Thành công',
                             'data':{

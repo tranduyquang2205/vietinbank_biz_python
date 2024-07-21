@@ -1,1 +1,0 @@
-{"username": "08864387951", "password": "Dqxkv2205.,", "account_number": "0621000456871", "sessionId": "", "mobileId": "", "clientId": "", "cif": "", "E": "", "res": "", "tranId": "", "browserToken": "", "browserId": "fb947fc5ae31786a9489ba3466f5525d"}
