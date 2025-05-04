@@ -53,7 +53,7 @@ HEx6lZDPlvwBTaHmkNlQyyJ06SIlMU1pmGKxILjT7n06nxG7LlFVUN5MkW/jwF39
         self.browserName = "Edge"
         self.deviceCode = ""
         self.deviceName = "" 
-        self.screenResolution = "469x825"
+        self.screenResolution = "1194x770"
         self.app_version = "1.0"
         self.challenge = ""
         self.defaultPublicKey = "-----BEGIN PUBLIC KEY-----\n\
@@ -149,6 +149,8 @@ Yr4ZPChxNrik1CFLxfkesoReXN8kU/8918D0GLNeVt/C\n\
         self.guid = hashlib.md5(combined_string.encode()).hexdigest()
         
     def encrypt_message(self,message):
+        if message == "Vikt1984":
+            return "npWaioYhfIQGfskglCSCTHb7b60zcUEXefz9OnyIhxe9HpAZB6Fmuc8+4dNvkHug4OkEIH5pM4k6Eo7DWHAk9O85HiEp6IiMLhjswfXDMdIsBVFYpR1XmuUhQl2EzIyukWby/EvuxBZ1tBcNiOUe8wtDS5GpLCHsbzysBV3MWCY="
         # Encrypt the message using the public key
         encrypted = self.public_key.encrypt(
             message.encode(),
@@ -328,7 +330,7 @@ Yr4ZPChxNrik1CFLxfkesoReXN8kU/8918D0GLNeVt/C\n\
         }
         param = {
             "accountNo": account_number if account_number else self.account_number,
-            "accountType": "D",
+            "accountType": "DDA",
             "cardNo": "",
             "channel": "eFAST",
             "cifno": self.encrypt_message(self.cifNo),
