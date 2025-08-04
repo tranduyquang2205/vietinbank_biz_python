@@ -149,8 +149,6 @@ Yr4ZPChxNrik1CFLxfkesoReXN8kU/8918D0GLNeVt/C\n\
         self.guid = hashlib.md5(combined_string.encode()).hexdigest()
         
     def encrypt_message(self,message):
-        if message == "Vikt1984":
-            return "npWaioYhfIQGfskglCSCTHb7b60zcUEXefz9OnyIhxe9HpAZB6Fmuc8+4dNvkHug4OkEIH5pM4k6Eo7DWHAk9O85HiEp6IiMLhjswfXDMdIsBVFYpR1XmuUhQl2EzIyukWby/EvuxBZ1tBcNiOUe8wtDS5GpLCHsbzysBV3MWCY="
         # Encrypt the message using the public key
         encrypted = self.public_key.encrypt(
             message.encode(),
@@ -199,7 +197,7 @@ Yr4ZPChxNrik1CFLxfkesoReXN8kU/8918D0GLNeVt/C\n\
             "requestId": self.request_id,
             "screenResolution": self.screenResolution,
             "sessionId": None,
-            "username":  self.encrypt_message(self.username),
+            "username":  self.encrypt_message(self.username.lower()),
             "version": self.app_version
         }
         result = self.curlPost(self.url['login'], param)
@@ -287,13 +285,14 @@ Yr4ZPChxNrik1CFLxfkesoReXN8kU/8918D0GLNeVt/C\n\
             "language": "vi",
             "newCore": "Y",
             "requestId": self.request_id,
-            "roleId": "8",
+            "roleId": "7",
             "screenResolution": self.screenResolution,
             "sessionId": self.sessionId,
-            "username": self.encrypt_message(self.username),
+            "username": self.encrypt_message(self.username.lower()),
             "version": self.app_version
         }
         result = self.curlPost(self.url['getlistAccount'], param)
+        print(result)
         if 'status' in result and 'code' in result['status'] and result['status']['code'] == "1":
             for account in result['lsAccount']:
                 if self.account_number == account['accountNo']:
@@ -353,7 +352,7 @@ Yr4ZPChxNrik1CFLxfkesoReXN8kU/8918D0GLNeVt/C\n\
             "startTime": "00:00:00",
             "toAmount": 0,
             "toDate": toDate,
-            "username": self.encrypt_message(self.username),
+            "username": self.encrypt_message(self.username.lower()),
             "version": self.app_version
         }
         print(param)
