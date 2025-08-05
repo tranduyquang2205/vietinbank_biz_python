@@ -197,7 +197,7 @@ Yr4ZPChxNrik1CFLxfkesoReXN8kU/8918D0GLNeVt/C\n\
             "requestId": self.request_id,
             "screenResolution": self.screenResolution,
             "sessionId": None,
-            "username":  self.encrypt_message(self.username.lower()),
+            "username":  self.encrypt_message(self.username),
             "version": self.app_version
         }
         result = self.curlPost(self.url['login'], param)
@@ -205,6 +205,7 @@ Yr4ZPChxNrik1CFLxfkesoReXN8kU/8918D0GLNeVt/C\n\
             self.cifNo = result['cifNo']
             self.sessionId = result['sessionId']
             self.userInfo = result['corpUser']
+            self.username = result['corpUser']['username']
             self.save_data()
             self.is_login = True
             return {
@@ -273,7 +274,7 @@ Yr4ZPChxNrik1CFLxfkesoReXN8kU/8918D0GLNeVt/C\n\
         result = base64.b64encode(response.content).decode('utf-8')
         return result
 
-    def getlistAccount(self):
+    def getlistAccount(self,retry=False):
         self.request_id = self.generate_request_id()
         if not self.is_login:
             login = self.doLogin()
@@ -288,31 +289,36 @@ Yr4ZPChxNrik1CFLxfkesoReXN8kU/8918D0GLNeVt/C\n\
             "roleId": "7",
             "screenResolution": self.screenResolution,
             "sessionId": self.sessionId,
-            "username": self.encrypt_message(self.username.lower()),
+            "username": self.encrypt_message(self.username),
             "version": self.app_version
         }
         result = self.curlPost(self.url['getlistAccount'], param)
-        print(result)
-        if 'status' in result and 'code' in result['status'] and result['status']['code'] == "1":
-            for account in result['lsAccount']:
-                if self.account_number == account['accountNo']:
-                    if float(account['availableBalance']) < 0 :
-                        return {'code':448,'success': False, 'message': 'Blocked account with negative balances!',
-                                'data': {
-                                    'balance':float(account['availableBalance'])
-                                }
-                                }
-                    else:
-                        return {'code':200,'success': True, 'message': 'Thành công',
-                                'data':{
-                                    'account_number':self.account_number,
-                                    'balance':float(account['availableBalance'])
-                        }}
-            return {'code':404,'success': False, 'message': 'account_number not found!'} 
+        if 'status' in result and 'code' in result['status']:
+            if result['status'] == 500 and 'error' in result and result['error'] == "Internal Server Error":
+                if not retry:
+                    return self.getlistAccount(retry=True)
+                else:
+                    return {'code':520 ,'success': False, 'message': 'Unknown Error!','data':result} 
+            elif 'code' in result['status'] and result['status']['code'] == "1":
+                for account in result['lsAccount']:
+                    if self.account_number == account['accountNo']:
+                        if float(account['availableBalance']) < 0 :
+                            return {'code':448,'success': False, 'message': 'Blocked account with negative balances!',
+                                    'data': {
+                                        'balance':float(account['availableBalance'])
+                                    }
+                                    }
+                        else:
+                            return {'code':200,'success': True, 'message': 'Thành công',
+                                    'data':{
+                                        'account_number':self.account_number,
+                                        'balance':float(account['availableBalance'])
+                            }}
+                return {'code':404,'success': False, 'message': 'account_number not found!','data':result} 
+            else: 
+                return {'code':520 ,'success': False, 'message': 'Unknown Error!','data':result} 
         else: 
-            return {'code':520 ,'success': False, 'message': 'Unknown Error!'} 
-
-
+            return {'code':520 ,'success': False, 'message': 'Unknown Error!','data':result} 
     def getHistories(self, fromDate="16/06/2023", toDate="16/06/2023", account_number='', page=0,limit = 100):
         self.request_id = self.generate_request_id()
         if not self.is_login:
@@ -352,7 +358,7 @@ Yr4ZPChxNrik1CFLxfkesoReXN8kU/8918D0GLNeVt/C\n\
             "startTime": "00:00:00",
             "toAmount": 0,
             "toDate": toDate,
-            "username": self.encrypt_message(self.username.lower()),
+            "username": self.encrypt_message(self.username),
             "version": self.app_version
         }
         print(param)
