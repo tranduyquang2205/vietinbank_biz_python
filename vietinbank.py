@@ -319,7 +319,7 @@ Yr4ZPChxNrik1CFLxfkesoReXN8kU/8918D0GLNeVt/C\n\
                 return {'code':520 ,'success': False, 'message': 'Unknown Error!','data':result} 
         else: 
             return {'code':520 ,'success': False, 'message': 'Unknown Error!','data':result} 
-    def getHistories(self, fromDate="16/06/2023", toDate="16/06/2023", account_number='', page=0,limit = 100):
+    def getHistories(self, fromDate="16/06/2023", toDate="16/06/2023", account_number='', page=0,limit = 100, retry=False):
         self.request_id = self.generate_request_id()
         if not self.is_login:
                 login = self.doLogin()
@@ -364,15 +364,24 @@ Yr4ZPChxNrik1CFLxfkesoReXN8kU/8918D0GLNeVt/C\n\
         print(param)
         result = self.curlPost(self.url['getHistories'], param)
         print(result)
-        if 'status' in result and 'code' in result['status'] and result['status']['code'] == "1":
-            return {'code':200,'success': True, 'message': 'Thành công',
-                            'data':{
-                                'transactions':result['transactions'],
-                    }}
+        if 'status' in result and 'code' in result['status']:
+            if result['status'] == 500 and 'error' in result and result['error'] == "Internal Server Error":
+                if not retry:
+                    return self.getHistories(fromDate, toDate, account_number, 0,100, retry=False)
+                else:
+                    return {'code':520 ,'success': False, 'message': 'Unknown Error!','data':result} 
+            elif 'code' in result['status'] and result['status']['code'] == "1" and 'transactions' in result:
+                return {'code':200,'success': True, 'message': 'Thành công',
+                                'data':{
+                                    'transactions':result['transactions'],
+                        }}
+            else:
+                return {'code':503 ,'success': False, 'message': 'Unknown Error!','data':result}
         else:
             return  {
                     "success": False,
                     "code": 503,
-                    "message": "Service Unavailable!"
+                    "message": "Service Unavailable!",
+                    "data": result
                 }
 
