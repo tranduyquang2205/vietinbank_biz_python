@@ -17,7 +17,17 @@ import base64
 from datetime import datetime
 
 class VTB:
-    def __init__(self, username, password, account_number):
+    def __init__(self, username, password, account_number,proxy_list=None):
+        self.proxy_list = proxy_list
+        if self.proxy_list:
+            self.proxy_info = random.choice(self.proxy_list)
+            proxy_host, proxy_port, username_proxy, password_proxy = self.proxy_info.split(':')
+            self.proxies = {
+                'http': f'http://{username_proxy}:{password_proxy}@{proxy_host}:{proxy_port}',
+                'https': f'http://{username_proxy}:{password_proxy}@{proxy_host}:{proxy_port}'
+            }
+        else:
+            self.proxies = None
                 # Public key in PEM format
         self.public_key_pem = """
 -----BEGIN PUBLIC KEY-----
@@ -177,7 +187,7 @@ Yr4ZPChxNrik1CFLxfkesoReXN8kU/8918D0GLNeVt/C\n\
         'sec-ch-ua-mobile': '?0',
         'sec-ch-ua-platform': '"Windows"'
         }
-        response = self.session.post(url, headers=headers, data=json.dumps(data))
+        response = self.session.post(url, headers=headers, data=json.dumps(data),proxies=self.proxies)
         try:
             result = response.json()
         except:
@@ -270,7 +280,7 @@ Yr4ZPChxNrik1CFLxfkesoReXN8kU/8918D0GLNeVt/C\n\
     def getCaptcha(self):
         captchaToken = ''.join(random.choices(string.ascii_uppercase + string.digits, k=30))
         url = self.url['getCaptcha'] + captchaToken
-        response = requests.get(url)
+        response = requests.get(url,proxies=self.proxies)
         result = base64.b64encode(response.content).decode('utf-8')
         return result
 
@@ -293,7 +303,7 @@ Yr4ZPChxNrik1CFLxfkesoReXN8kU/8918D0GLNeVt/C\n\
             "version": self.app_version
         }
         result = self.curlPost(self.url['getlistAccount'], param)
-        if 'status' in result and 'code' in result['status']:
+        if 'status' in result:
             if result['status'] == 500 and 'error' in result and result['error'] == "Internal Server Error":
                 if not retry:
                     return self.getlistAccount(retry=True)
@@ -364,7 +374,7 @@ Yr4ZPChxNrik1CFLxfkesoReXN8kU/8918D0GLNeVt/C\n\
         print(param)
         result = self.curlPost(self.url['getHistories'], param)
         print(result)
-        if 'status' in result and 'code' in result['status']:
+        if 'status' in result:
             if result['status'] == 500 and 'error' in result and result['error'] == "Internal Server Error":
                 if not retry:
                     return self.getHistories(fromDate, toDate, account_number, 0,100, retry=False)

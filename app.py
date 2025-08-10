@@ -18,10 +18,11 @@ class LoginDetails(BaseModel):
     username: str
     password: str
     account_number: str
+    proxy_list: list = None
 @app.post('/login', tags=["login"])
 def login_api(input: LoginDetails):
     try:
-        vtb = VTB(input.username, input.password, input.account_number)
+        vtb = VTB(input.username, input.password, input.account_number,input.proxy_list)
         response = vtb.doLogin()
         return APIResponse.json_format(response)
     except Exception as e:
@@ -32,7 +33,7 @@ def login_api(input: LoginDetails):
 @app.post('/balance', tags=["balance"])
 def confirm_api(input: LoginDetails):
     try:
-        vtb = VTB(input.username, input.password, input.account_number)
+        vtb = VTB(input.username, input.password, input.account_number,input.proxy_list)
         response = vtb.getlistAccount()
         return APIResponse.json_format(response)
     except Exception as e:
@@ -54,11 +55,12 @@ class Transactions(BaseModel):
     to_date: str
     page: int
     limit: int
+    proxy_list: list = None
     
 @app.post('/get_transactions', tags=["get_transactions"])
 def get_transactions_api(input: Transactions):
     try:
-        vtb = VTB(input.username, input.password, input.account_number)
+        vtb = VTB(input.username, input.password, input.account_number,input.proxy_list)
         response = vtb.getHistories(input.from_date, input.to_date, input.account_number,input.page,input.limit)
         return APIResponse.json_format(response)
     except Exception as e:
